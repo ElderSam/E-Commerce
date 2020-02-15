@@ -5,6 +5,7 @@ require_once("vendor/autoload.php");
 //Namespaces que vou usar
 use \Slim\Slim;
 use \Eldersam\Page;
+use \Eldersam\PageAdmin;
 
 $app = new Slim(); //chama nova aplicação do Slim
 
@@ -18,6 +19,17 @@ $app->get('/', function() {
 
 	$page->setTpl("index"); //mostra o conteúdo de index.html
 
+});
+
+
+//rota para acessar o Admin
+$app->get('/admin/', function() {
+	
+	//echo "ADMIN";
+	$page = new PageAdmin(); //cria uma nova página
+
+	
+	$page->setTpl("index"); //mostra o conteúdo de index.html
 
 });
 
