@@ -2,20 +2,22 @@
 
 require_once("vendor/autoload.php");
 
-$app = new \Slim\Slim(); //chama nova aplicação do Slim
+//Namespaces que vou usar
+use \Slim\Slim;
+use \Eldersam\Page;
+
+$app = new Slim(); //chama nova aplicação do Slim
 
 //configura o modo Debug para explicar cada erro 
 $app->config('debug', true);
 
 //rota principal
 $app->get('/', function() {
-    
-	//echo "OK";
-	$sql = new Eldersam\DB\Sql();
+	
+	$page = new Page(); //cria uma nova página
 
-	$results = $sql->select("SELECT * FROM tb_users");
+	$page->setTpl("index"); //mostra o conteúdo de index.html
 
-	echo json_encode($results);
 
 });
 
