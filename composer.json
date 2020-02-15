@@ -13,7 +13,7 @@
     },
     "autoload": {
         "psr-4": {
-            "": "vendor\\eldersam\\php-classes\\src"
+            "Eldersam\\": "vendor\\eldersam\\php-classes\\src"
         }
     }
 }
