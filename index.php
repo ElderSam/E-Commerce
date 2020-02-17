@@ -45,7 +45,7 @@ $app->get('/admin/login/', function() {
 		"footer"=>false
 	]);
 	
-	$page->setTpl("login"); //mostra o conteúdo de index.html
+	$page->setTpl("login"); //mostra o conteúdo de login.html
 
 });
 
@@ -169,6 +169,93 @@ $app->post("/admin/users/:iduser", function($iduser){
 	header("Location: /admin/users");
 	exit;
 	
+});
+
+/* Rota FORGOT (página com formulário com email) ---------------- */
+$app->get("/admin/forgot", function(){
+
+	$page = new PageAdmin([
+		//desabilita o header e footer padroes
+		"header"=>false,
+		"footer"=>false
+	]);
+	
+	$page->setTpl("forgot"); //mostra o conteúdo de forgot.html
+});
+
+
+/* Rota FORGOT (envia email) -------------------------*/
+$app->post("/admin/forgot", function(){
+
+	$user = User::getForgot($_POST["email"]);
+
+	header("Location: /admin/forgot/sent");
+	exit;
+
+});
+
+/* Rota FORGOT/SENT (página de email enviado com sucesso) */
+$app->get("/admin/forgot/sent", function(){
+
+	$page = new PageAdmin([
+		//desabilita o header e footer padroes
+		"header"=>false,
+		"footer"=>false
+	]);
+	
+	$page->setTpl("forgot-sent"); //mostra o conteúdo de forgot-sent.html
+
+});
+
+
+$app->get("/admin/forgot/reset", function(){
+
+	$user = User::validForgotDecrypt($_GET["code"]);
+
+	$page = new PageAdmin([
+		//desabilita o header e footer padroes
+		"header"=>false,
+		"footer"=>false
+	]);
+	
+	$page->setTpl("forgot-reset", array(
+		"name"=>$user["desperson"],
+		"code"=>$_GET["code"] //o código criptografado, para impedir o hacker acessar a página e recuperar
+	)); //mostra o conteúdo de forgot-reset-success.html
+
+});
+
+
+$app->post("/admin/forgot/reset", function(){
+
+	$forgot = User::validForgotDecrypt($_POST["code"]); //Para segurança
+
+	User::setForgotUsed($forgot["idrecovery"]);
+
+	//Trocar a senha de fato -------------------------------
+	$user = new User();
+
+	$user->get((int)$forgot["iduser"]); //pega o id do usuário que vai recuperar
+
+	//https://www.php.net/manual/en/function.password-hash.php
+	$password =  password_hash($_POST["password"], PASSWORD_DEFAULT, [
+		"cost"=>12 //quanto maior o número, mais seguro vai ser o hash, porém mais vai usar do processamento do servidor, o que poder fazer ele 'cair' se tiver muitas requisições disso ao mesmo tempo
+	]);
+
+	$user->setPassword($password); //muda a senha recebida pelo formulário de recuperação
+
+	$page = new PageAdmin([
+		//desabilita o header e footer padroes
+		"header"=>false,
+		"footer"=>false
+	]);
+	
+	$page->setTpl("forgot-reset-success"); //mostra o conteúdo de forgot-reset.html
+
+
+
+
+
 });
 
 

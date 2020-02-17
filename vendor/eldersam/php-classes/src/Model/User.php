@@ -1,12 +1,18 @@
 <?php
 
 namespace Eldersam\Model;
+
 use \Eldersam\DB\Sql;
 use \Eldersam\Model;
+use \Eldersam\Mailer;
+
 
 class User extends Model{
 
     const SESSION = "User";
+    const SECRET = "HcodePhp7_Secret"; //here your key (secret)
+    const SECRET_IV = "HcodePhp7_Secret_IV"; //here your key 2 (secret)
+
 
     public static function login($login, $password){
 
@@ -130,4 +136,116 @@ class User extends Model{
             "iduser"=>$this->getiduser()
         ));
     }
+
+    public static function getForgot($email){
+
+        $sql = new Sql();
+
+        $results = $sql->select("
+        SELECT * 
+        FROM tb_persons a 
+        INNER JOIN tb_users b USING(idperson) 
+        WHERE a.desemail = :desemail;
+        ", array(
+            ":desemail"=>$email
+        ));
+
+        if(count($results) == 0){ //se não retornou nenhum email
+
+            throw new \Exception("Não foi possível recuperar a senha.");
+        
+        }else{
+
+            $data = $results[0];
+            $results2 = $sql->select("CALL sp_userspasswordsrecoveries_create(:iduser, :desip)", array(
+                ":iduser"=>$data["iduser"],
+                ":desip"=>$_SERVER["REMOTE_ADDR"]
+            ));
+
+            if(count($results2) === 0){
+
+                throw new \Exception("Não foi possível recuperar a senha.");
+            
+            }else{
+
+                $dataRecovery = $results2[0];
+
+                $code = openssl_encrypt($dataRecovery['idrecovery'], 'AES-128-CBC', pack("a16", User::SECRET), 0, pack("a16", User::SECRET_IV));
+                
+                base64_encode($code);
+
+                $link = "http://www.ecommerce.com.br/admin/forgot/reset?code=$code";
+
+                //obs: O quarto arqumento do contrutor do Mailer, é a página que vai enviar para o e-mail, e está em /view/email/forgot.html
+                $mailer = new Mailer($data["desemail"], $data["desperson"], "Redefinir Senha da Green Store", "forgot",
+                array(
+                    "name"=>$data["desperson"],
+                    "link"=>$link
+                ));
+
+                $mailer->send();
+
+                return $data; //retorna com os dados do usuário que foi recuperado
+            }
+        }
+    }
+
+    public function validForgotDecrypt($code){
+
+        $sql = new Sql();
+        
+        base64_decode($code); //decodifica o get recebido para recuperar a senha do usuário
+
+        $idrecovery = openssl_decrypt($code, 'AES-128-CBC', pack("a16", User::SECRET), 0, pack("a16", User::SECRET_IV));
+       
+
+        //OBS: lembre-se que nesse caso, na query abaixo está definido o INTERVAL de tempo para recuperar a senha em até 1 hora
+        $results = $sql->select("
+            SELECT *
+            FROM tb_userspasswordsrecoveries a
+            INNER JOIN tb_users b USING(iduser)
+            INNER JOIN tb_persons c USING(idperson)
+            WHERE
+                a.idrecovery = :idrecovery
+                AND
+                a.dtrecovery IS NULL
+                AND
+                DATE_ADD(a.dtregister, INTERVAL 1 HOUR) >= NOW();
+        ", array(
+            ":idrecovery"=>$idrecovery
+        ));
+
+        if (count($results) === 0) //não retornou nada
+        {
+            throw new \Exception("Não foi possível recuperar a senha.");
+        }
+        else
+        {
+
+            return $results[0];
+
+        }    
+    }
+
+
+    public static function setForgotUsed($idrecovery){
+
+        $sql = new Sql();
+
+        $sql->query("UPDATE tb_userspasswordsrecoveries SET dtrecovery = NOW() WHERE idrecovery = :idrecovery", array(
+            ":idrecovery"=>$idrecovery
+        ));
+    }
+
+    public function setPassword($password)
+	{
+
+		$sql = new Sql();
+
+		$sql->query("UPDATE tb_users SET despassword = :password WHERE iduser = :iduser", array(
+			":password"=>$password,
+			":iduser"=>$this->getiduser()
+		));
+
+	}
 }
