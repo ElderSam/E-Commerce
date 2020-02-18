@@ -343,7 +343,7 @@ $app->get("/admin/categories/:idcategory/delete", function($idcategory){
 
 });
 
-$app->get("/admin/categories/:idcategory", function($idcategory){
+$app->get("/admin/categories/:idcategory", function($idcategory){ 
 
 	User::verifyLogin();
 
@@ -359,7 +359,7 @@ $app->get("/admin/categories/:idcategory", function($idcategory){
 
 });
 
-$app->post("/admin/categories/:idcategory", function($idcategory){
+$app->post("/admin/categories/:idcategory", function($idcategory){ 
 
 	User::verifyLogin();
 
@@ -432,8 +432,37 @@ $app->get("/admin/categories/:idcategory/products/:idproduct/remove", function($
 
 });
 
-/* --------------------------------- FIM ROTAS CATEGORIES ----------------------------------------------------- */
+/* --------------------------------- FIM ROTAS ADMIN-CATEGORIES ----------------------------------------------------- */
 
+
+
+$app->get("/categories/:idcategory", function($idcategory){
+
+	//$page = (isset($_GET['page'])) ? (int)$_GET['page'] : 1;
+
+	$category = new Category();
+
+	$category->get((int)$idcategory);
+
+	//$pagination = $category->getProductsPage($page);
+
+	//$pages = [];
+
+/*	for ($i=1; $i <= $pagination['pages']; $i++) { 
+		array_push($pages, [
+			'link'=>'/categories/'.$category->getidcategory().'?page='.$i,
+			'page'=>$i
+		]);
+	}
+*/
+	$page = new Page();
+
+	$page->setTpl("category", [
+		'category'=>$category->getValues(),
+		'products'=>[]
+	]);
+
+});
 
 //executa
 $app->run();
