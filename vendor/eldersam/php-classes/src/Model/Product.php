@@ -124,7 +124,7 @@ class Product extends Model {
 		$this->getidproduct() . ".jpg";
 
 
-		if(!$imageExists){
+		if(!isset($imageExists)){
 			
 			imagejpeg($image, $dist);
 
