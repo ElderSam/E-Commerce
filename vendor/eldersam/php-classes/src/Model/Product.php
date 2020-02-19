@@ -8,14 +8,27 @@ use \Eldersam\Mailer;
 
 class Product extends Model {
 
-	public static function listAll()
-	{
+	public static function listAll(){
 
 		$sql = new Sql();
 
 		return $sql->select("SELECT * FROM tb_products ORDER BY desproduct");
 
 	}
+
+	//converte um array de dados de produtos em um array de objetos Product, para que seja mais fácil renderizá-los na página HTML
+	public static function checkList($list){ 
+
+		foreach($list as &$row){ //obs: observe que manda o endereço da row na list
+
+			$p = new Product();
+			$p->setData($row);
+			$row = $p->getValues();
+		}
+
+		return $list; //retorna o array list já formatado (com desphoto)
+	}
+
 
 	public function save()
 	{

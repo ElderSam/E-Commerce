@@ -1,12 +1,17 @@
 <?php
 
 use \Eldersam\Page;
+use \Eldersam\Model\Product;
 
 /*rota principal -----------------------------------------------------------*/
 $app->get('/', function() {
 	
-	$page = new Page(); //cria uma nova página
+	$products = Product::listAll();
 
-	$page->setTpl("index"); //mostra o conteúdo de index.html
+	$page = new Page(); //cria uma nova página
+	
+	$page->setTpl("index", [
+		'products'=>Product::checkList($products)
+	]); //mostra o conteúdo de index.html
 
 });
