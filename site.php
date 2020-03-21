@@ -62,13 +62,71 @@ $app->get("/products/:desurl", function($desurl){
 
 });
 
+//rota para a página do carrinho
 $app->get("/cart", function(){
 
 	$cart = Cart::getFromSession();
 
 	$page = new Page();
 
-	$page->setTpl("cart");
+	$page->setTpl("cart", [
+		'cart'=>$cart->getValues(),
+		'products'=>$cart->getProducts()
+	]);
+});
+
+//rota para adicionar produto ao carrinho
+$app->get("/cart/:idproduct/add", function($idproduct){
+
+	$product = new Product();
+
+	$product->get((int)$idproduct);
+
+	//recupera o carrinho
+	$cart = Cart::getFromSession();
+
+	$qtd = (isset($_GET['qtd'])) ? (int)$_GET['qtd'] : 1;
+
+	for($i=0; $i<$qtd; $i++){
+
+		$cart->addProduct($product);
+	}
+
+	header("Location: /cart");
+	exit;
+});
+
+//rota para remover uma quantidade de um produto do carrinho
+$app->get("/cart/:idproduct/minus", function($idproduct){
+
+	$product = new Product();
+
+	$product->get((int)$idproduct);
+
+	//recupera o carrinho
+	$cart = Cart::getFromSession();
+
+	$cart->removeProduct($product);
+
+	header("Location: /cart");
+	exit;
+});
+
+
+//rota para remover todos os produto do mesmo tipo (todas as quantidades relacionadas ao mesmo produto) do carrinho
+$app->get("/cart/:idproduct/remove", function($idproduct){
+
+	$product = new Product();
+
+	$product->get((int)$idproduct);
+
+	//recupera o carrinho
+	$cart = Cart::getFromSession();
+
+	$cart->removeProduct($product, true); //true para remover todos
+
+	header("Location: /cart");
+	exit;
 });
 
 
