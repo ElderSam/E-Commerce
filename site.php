@@ -3,6 +3,7 @@
 use \Eldersam\Page;
 use \Eldersam\Model\Category;
 use \Eldersam\Model\Product;
+use \Eldersam\Model\Cart;
 
 /*rota principal -----------------------------------------------------------*/
 $app->get('/', function() {
@@ -59,6 +60,15 @@ $app->get("/products/:desurl", function($desurl){
 		'categories'=>$product->getCategories()
 	]);
 
+});
+
+$app->get("/cart", function(){
+
+	$cart = Cart::getFromSession();
+
+	$page = new Page();
+
+	$page->setTpl("cart");
 });
 
 

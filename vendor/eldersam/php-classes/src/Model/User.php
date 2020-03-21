@@ -13,6 +13,43 @@ class User extends Model{
     const SECRET = "HcodePhp7_Secret"; //here your key (secret)
     const SECRET_IV = "HcodePhp7_Secret_IV"; //here your key 2 (secret)
 
+    public static function getFromSession(){
+
+        if(isset($_SESSION[User::SESSION]) && ((int)$_SESSION[User::SESSION]['iduser'] > 0)){
+
+            $user = new User();
+
+            $user->setData($_SESSION[User::SESSION]);
+         
+        }
+
+        return $user;
+    }
+
+    public static function checkLogin($inadmin = true){
+
+        if(
+            !isset($_SESSION[User::SESSION])
+            ||
+            !$_SESSION[User::SESSION]
+            ||
+            !(int)$_SESSION[User::SESSION]["iduser"] > 0 //se é um usuário. obs: se for vazia, transforma em 0  
+        ){
+            return false;
+
+        }else{
+
+            if($inadmin == true && (bool)$_SESSION[User::SESSION]['inadmin'] == true){
+
+                return true;
+
+            }else{
+
+                return false;
+            }          
+            
+        }
+    }
 
     public static function login($login, $password){
 
@@ -51,17 +88,9 @@ class User extends Model{
 
     }
 
-    public static function verifyLogin(){
+    public static function verifyLogin($inadmin = true){
 
-        if(
-            !isset($_SESSION[User::SESSION])
-            ||
-            !$_SESSION[User::SESSION]
-            ||
-            !(int)$_SESSION[User::SESSION]["iduser"] > 0 //se é um usuário. obs: se for vazia, transforma em 0
-            ||
-            !(bool)$_SESSION[User::SESSION]["inadmin"] //se é um ADMINISTRADOR
-        ){
+        if(User::checkLogin($inadmin)){
             
             header("Location: /admin/login/");
             exit;
