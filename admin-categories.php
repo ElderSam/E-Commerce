@@ -3,6 +3,7 @@
 use \Eldersam\PageAdmin;
 use \Eldersam\Model\User;
 use \Eldersam\Model\Category;
+use \Eldersam\Model\Product;
 
 /* --------------------------------- ROTAS ADMIN-CATEGORIES ----------------------------------------------------- */
 $app->get("/admin/categories", function(){
@@ -88,6 +89,7 @@ $app->get("/admin/categories/:idcategory/delete", function($idcategory){
 
 });
 
+
 $app->get("/admin/categories/:idcategory", function($idcategory){ 
 
 	User::verifyLogin();
@@ -99,7 +101,8 @@ $app->get("/admin/categories/:idcategory", function($idcategory){
 	$page = new PageAdmin();
 
 	$page->setTpl("categories-update", [
-		'category'=>$category->getValues()
+		'category'=>$category->getValues()/*,
+		'products'=>[]*/
 	]);	
 
 });
@@ -121,6 +124,8 @@ $app->post("/admin/categories/:idcategory", function($idcategory){
 
 });
 
+
+
 $app->get("/admin/categories/:idcategory/products", function($idcategory){
 
 	User::verifyLogin();
@@ -139,6 +144,7 @@ $app->get("/admin/categories/:idcategory/products", function($idcategory){
 
 });
 
+//rota para adicionar produto à Categoria
 $app->get("/admin/categories/:idcategory/products/:idproduct/add", function($idcategory, $idproduct){
 
 	User::verifyLogin();
@@ -158,6 +164,7 @@ $app->get("/admin/categories/:idcategory/products/:idproduct/add", function($idc
 
 });
 
+//rota para remover o produto da Categoria
 $app->get("/admin/categories/:idcategory/products/:idproduct/remove", function($idcategory, $idproduct){
 
 	User::verifyLogin();
@@ -179,30 +186,58 @@ $app->get("/admin/categories/:idcategory/products/:idproduct/remove", function($
 /* --------------------------------- FIM ROTAS ADMIN-CATEGORIES ----------------------------------------------------- */
 
 
-$app->get("/categories/:idcategory", function($idcategory){
-
-	//$page = (isset($_GET['page'])) ? (int)$_GET['page'] : 1;
+$app->get("admin/categories/:idcategory/products", function($idcategory){
+	
+	User::verifyLogin();
 
 	$category = new Category();
 
 	$category->get((int)$idcategory);
 
-	//$pagination = $category->getProductsPage($page);
+	$page = new PageAdmin();
 
-	//$pages = [];
-
-/*	for ($i=1; $i <= $pagination['pages']; $i++) { 
-		array_push($pages, [
-			'link'=>'/categories/'.$category->getidcategory().'?page='.$i,
-			'page'=>$i
-		]);
-	}
-*/
-	$page = new Page();
-
-	$page->setTpl("category", [
+	$page->setTpl("categories-products", [
 		'category'=>$category->getValues(),
-		'products'=>[]
+		'productsRelated'=>getProducts(),
+		'productsNotRelated'=>getProducts($false)
 	]);
+
+});
+
+$app->get("admin/categories/:idcategory/products/:idproduct/add", function($idcategory, $idproduct){
+
+	User::verifyLogin();
+
+	$category = new Category();
+
+	$category->get((int)$idcategory);
+
+	$product = new Product();
+
+	$product->get((int)$idproduct);
+
+	$product->addProduct($product);
+/*
+	header("Location: /admin/categories/".$idcategory."/products");
+	exit;
+*/
+});
+
+$app->get("admin/categories/:idcategory/products/:idproduct/remove", function($idcategory, $idproduct){
+	
+	User::verifyLogin();
+
+	$category = new Category();
+
+	$category->get((int)$idcategory);
+
+	$product = new Product();
+
+	$product->get((int)$idproduct);
+	
+	$category->removeProduct($product);
+
+	header("Location: /admin/categories/".$idcategory."/products");
+	exit;
 
 });
