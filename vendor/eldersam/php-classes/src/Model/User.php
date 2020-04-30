@@ -188,7 +188,7 @@ class User extends Model{
         ));
     }
 
-    public static function getForgot($email){
+    public static function getForgot($email, $inadmin = true){
 
         $sql = new Sql();
 
@@ -200,7 +200,7 @@ class User extends Model{
         ", array(
             ":desemail"=>$email
         ));
-
+        
         if(count($results) == 0){ //se não retornou nenhum email
 
             throw new \Exception("Não foi possível recuperar a senha.");
@@ -225,7 +225,16 @@ class User extends Model{
                 
                 base64_encode($code);
 
-                $link = "http://www.ecommerce.com.br/admin/forgot/reset?code=$code";
+                if($inadmin === true){
+
+                    $link = "http://www.ecommerce.com.br/admin/forgot/reset?code=$code";
+
+                }else{
+
+                    $link = "http://www.ecommerce.com.br/forgot/reset?code=$code";
+
+                }
+
 
                 //obs: O quarto arqumento do contrutor do Mailer, é a página que vai enviar para o e-mail, e está em /view/email/forgot.html
                 $mailer = new Mailer($data["desemail"], $data["desperson"], "Redefinir Senha da Green Store", "forgot",
