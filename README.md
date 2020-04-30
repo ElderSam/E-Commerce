@@ -6,7 +6,7 @@ Template usado no projeto [Almsaeed Studio](https://almsaeedstudio.com)
 
 Para funcionar funções de mandar e-mail como a recuperação de senha, você precisa colocar um e-mail padrão do sistema para ele ser o Remetente:
 
-na Classe Mailer no caminho: C:\E-Commerce\vendor\eldersam\php-classes\src\Mailer.php
+na Classe Mailer no caminho: \vendor\eldersam\php-classes\src\Mailer.php
 
 coloque seu e-mail (Gmail) e senha nas Constantes abaixo (MAS LEMBRE-SE DE APAGAR SE VOCÊ FOR SUBIR O PROJETO PARA O GITHUB, PARA NINGUÉM ROUBAR SUA CONTA): 
 
