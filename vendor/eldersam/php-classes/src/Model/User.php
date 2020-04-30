@@ -22,8 +22,6 @@ class User extends Model{
 
         if(isset($_SESSION[User::SESSION]) && ((int)$_SESSION[User::SESSION]['iduser'] > 0)){
 
-            //$user = new User();
-
             $user->setData($_SESSION[User::SESSION]);
          
         }
@@ -169,7 +167,7 @@ class User extends Model{
             ":iduser"=>$this->getiduser(),
             ":desperson"=>utf8_decode($this->getdesperson()),
             ":deslogin"=>$this->getdeslogin(),
-            ":despassword"=>User::getPasswordHash($this->getdespassword()),
+            ":despassword"=>$this->getdespassword(),
             ":desemail"=>$this->getdesemail(),
             ":nrphone"=>$this->getnrphone(),
             ":inadmin"=>$this->getinadmin()
@@ -177,6 +175,9 @@ class User extends Model{
         ));
 
         $this->setData($results[0]);
+
+        $_SESSION[User::SESSION] = $this->getValues();
+
     }
 
     public function delete(){

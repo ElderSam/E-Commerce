@@ -158,6 +158,16 @@ $app->get("/checkout", function(){
 	]);
 });
 
+$app->get("/register", function(){
+
+	$page = new Page();
+
+	$page->setTpl("login", [
+		'error'=>User::getError(),
+		'errorRegister'=>User::getErrorRegister(),
+		'registerValues'=>(isset($_SESSION['registerValues'])) ? $_SESSION['registerValues'] : ['name'=>'', 'email'=>'', 'phone'=>'']
+	]);
+});
 
 $app->get("/login", function(){
 
@@ -166,7 +176,7 @@ $app->get("/login", function(){
 	$page->setTpl("login", [
 		'error'=>User::getError(),
 		'errorRegister'=>User::getErrorRegister(),
-		'registerValues'=>(isset($_SESSION['registerValues'])) ? $_SESSION['registerValues'] : ['name'=>'', 'email'=>'', 'phone'=>'']
+		'registerValues'=>['name'=>'', 'email'=>'', 'phone'=>'']
 	]);
 });
 
@@ -203,28 +213,28 @@ $app->post("/register", function(){
 	if(!isset($_POST['name']) || $_POST['name'] == ''){
 
 		User::setErrorRegister("Preencha o seu nome.");
-		header("Location: /login");
+		header("Location: /register");
 		exit;
 	}
 
 	if(!isset($_POST['email']) || $_POST['email'] == ''){
 
 		User::setErrorRegister("Preencha o seu e-mail.");
-		header("Location: /login");
+		header("Location: /register");
 		exit;
 	}
 
 	if(!isset($_POST['password']) || $_POST['password'] == ''){
 
 		User::setErrorRegister("Preencha a senha.");
-		header("Location: /login");
+		header("Location: /register");
 		exit;
 	}
 
 	if(User::checkLoginExists($_POST['email']) === true){
 
 		User::setErrorRegister("Este endereo de e-mail já está sendo usado por outro usuário.");
-		header("Location: /login");
+		header("Location: /register");
 		exit;
 	}
 
