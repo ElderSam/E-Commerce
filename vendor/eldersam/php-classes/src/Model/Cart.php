@@ -210,7 +210,7 @@ class Cart extends Model {
                 'StrRetorno'=>'xml'               
             ]);
             
-            echo json_encode($qs);
+            //echo json_encode($qs);
             
             $xml = simplexml_load_file("http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx/CalcPrecoPrazo?" .$qs); //função para ler XML
 
