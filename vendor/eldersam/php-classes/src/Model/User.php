@@ -322,12 +322,27 @@ class User extends Model{
 
     }
 
-    public static function setErrorRegister(){
+    public static function setErrorRegister($msg){
         
+        $_SESSION[User::ERROR_REGISTER] = $msg;
+    }
+
+    public static function getErrorRegister(){
+
+        $msg = (isset($_SESSION[User::ERROR_REGISTER]) && $_SESSION[User::ERROR_REGISTER]) ? $_SESSION[User::ERROR_REGISTER] : '';
+
+        User::clearErrorRegister();
+
+        return $msg;
+    }
+
+    public static function clearErrorRegister(){
+
         $_SESSION[User::ERROR_REGISTER] = NULL;
     }
 
-    public static function checkLoginExist($login){
+
+    public static function checkLoginExist($login){ //verifica se já não existe um mesmo login no Banco de Dados
 
         $sql = new Sql();
 
