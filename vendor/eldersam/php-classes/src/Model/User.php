@@ -129,7 +129,7 @@ class User extends Model{
     }
 
     public function save(){
-        
+    
         $sql = new Sql();
 
         $results = $sql->select("CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
@@ -331,6 +331,28 @@ class User extends Model{
 
     }
 
+    public static function setSuccess($msg){
+
+        $_SESSION[User::SUCCESS] = $msg;
+
+    }
+
+    public static functIon getSuccess(){
+        
+        $msg = (isset($_SESSION[User::SUCCESS]) && $_SESSION[User::SUCCESS]) ? $_SESSION[User::SUCCESS] : '';
+
+        User::clearSuccess();
+
+        return $msg;
+
+    }
+
+    public static function clearSuccess(){
+
+        $_SESSION[User::SUCCESS] = NULL;
+
+    }
+
     public static function setErrorRegister($msg){
         
         $_SESSION[User::ERROR_REGISTER] = $msg;
@@ -351,7 +373,7 @@ class User extends Model{
     }
 
 
-    public static function checkLoginExist($login){ //verifica se já não existe um mesmo login no Banco de Dados
+    public static function checkLoginExists($login){ //verifica se já não existe um mesmo login no Banco de Dados
 
         $sql = new Sql();
 
